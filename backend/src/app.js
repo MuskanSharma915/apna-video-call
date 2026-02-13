@@ -2,6 +2,10 @@ import express from "express";
 import { createServer } from "node:http";
 import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
+
+
 
 import { connectToSocket } from "./controllers/socketManager.js";
 import userRoutes from "./routes/users.routes.js";
@@ -27,18 +31,26 @@ app.use("/api/v1/users", userRoutes);
 connectToSocket(server);
 
 // start server
+
+const PORT = process.env.PORT || 8000;
+
 const start = async () => {
-  await mongoose.connect(
-    "mongodb+srv://sharmamuskan4542_db_user:JEP7P34004vaS7Ae@cluster0.yv8zt0u.mongodb.net/?appName=Cluster0"
-  );
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected");
 
-  console.log("MongoDB connected");
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 
-  server.listen(8000, () => {
-    console.log("Server running on port 8000");
-  });
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+  }
 };
 
 start();
+
+
+
 
 
